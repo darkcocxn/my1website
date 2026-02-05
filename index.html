@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>时间查询小程序</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            /* 使用 Telegram 提供的系统变量，自动适配深色/浅色模式 */
+            background-color: var(--tg-theme-bg-color, #ffffff);
+            color: var(--tg-theme-text-color, #222222);
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container { text-align: center; }
+        h1 { font-size: 1.2rem; margin-bottom: 20px; }
+        #time-display {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--tg-theme-button-color, #248bcf);
+            margin-bottom: 30px;
+        }
+        button {
+            padding: 12px 24px;
+            font-size: 1rem;
+            background-color: var(--tg-theme-button-color, #248bcf);
+            color: var(--tg-theme-button-text-color, #ffffff);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <p>你好, <span id="user-name">用户</span>!</p>
+        <h1>当前服务器时间</h1>
+        <div id="time-display">--:--:--</div>
+        <button onclick="updateTime()">刷新时间</button>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+
+        // 初始化小程序
+        tg.ready();
+        tg.expand(); // 铺满全屏
+
+        // 设置用户信息
+        const user = tg.initDataUnsafe?.user;
+        if (user) {
+            document.getElementById('user-name').innerText = user.first_name;
+        }
+
+        // 查询时间的函数
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+            document.getElementById('time-display').innerText = timeString;
+
+            // 调用 Telegram 的震动反馈（可选）
+            if (tg.HapticFeedback) {
+                tg.HapticFeedback.impactOccurred('medium');
+            }
+        }
+
+        // 初始调用一次
+        updateTime();
+
+        // 配置 Telegram 的主按钮 (Main Button)
+        tg.MainButton.setText("关闭小程序");
+        tg.MainButton.show();
+        tg.MainButton.onClick(() => {
+            tg.close();
+        });
+    </script>
+</body>
+</html>
